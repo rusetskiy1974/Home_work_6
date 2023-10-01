@@ -27,21 +27,23 @@ unknow_ext_files = set()
 def obhod_folder_(path, level = 1):   # обход папок через модуль pathlib
     path = normalize(path, True)
     p = Path(path)
-    # print(p)
+    print(p)
     movin_files(p)
     
     
     for f in p.iterdir():
-        # print (f)
+        print ('++', f)
 
         if f.is_dir() and  f.name not in search_folder_files.keys():
-            if next(f, None) == None:
-                f.rmdir()
+            # if next(Path(str(f)), None) == None:
+            #     Path(str(f)).rmdir()
+            #     continue
             # if  next(Path(path +'\\'+ f.name).iterdir(),None)  == None :
             #     Path(path +'\\'+ f.name).rmdir()
-            else:     
+            #     continue
+            # else:     
                 # print ('Спускаемось',(path + '\\'+ f.name))
-                obhod_folder_((path +'\\'+ f.name), level+1)
+            obhod_folder_((path +'\\'+ f.name), level+1)
                 # print ('Вертаємося в ', path)
 
 def movin_files (folder_n):
@@ -67,7 +69,7 @@ def movin_files (folder_n):
 
  
 def normalize(file_nam, fold = False):
-    # print(file_nam)
+    print(str(file_nam))
     if fold:
         fold_name = file_nam.rsplit('\\', 1)[-1]
         fold_name = fold_name.translate(TRANS)
@@ -105,7 +107,26 @@ def select_folder(file_name):
             extension_files.add(file_type)
             return key 
     unknow_ext_files.add(file_type) 
-    return ''    
+    return '' 
+
+def remov_empty_fold(path, level = 1):
+    p = Path(path)
+    print (p)
+    if next(p.iterdir(), None) == None:
+        p.rmdir()
+        # return
+    else :    
+        for f in p.iterdir():
+           if f.is_dir() and  f.name not in search_folder_files.keys():
+            # if next(Path(str(f)), None) == None:
+            #      Path(str(f)).rmdir()
+            #     continue
+                # if  next(Path(path +'\\'+ f.name).iterdir(),None)  == None :
+                #     Path(path +'\\'+ f.name).rmdir()
+                # continue
+            # else:     
+                # print ('Спускаемось',(path + '\\'+ f.name))
+                remov_empty_fold((path +'\\'+ f.name), level+1)
 
 
 
@@ -134,6 +155,10 @@ for key in search_folder_files:
 if __name__ == '__main__':
 
     obhod_folder_(search_path)
+    
+    
+    # remov_empty_fold(search_path)
+    
     
     print('Списки знайдених  файлів :', '\n') 
     for value in search_files.items():
