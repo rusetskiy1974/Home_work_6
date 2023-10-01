@@ -29,15 +29,16 @@ def obhod_folder_(path, level = 1):   # обход папок через мод�
     p = Path(path)
     print(p)
     movin_files(p)
+    # if next(p.iterdir(), None) == None:
+    #             p.rmdir()
+    #             return
     
     
     for f in p.iterdir():
         print ('++', f)
 
         if f.is_dir() and  f.name not in search_folder_files.keys():
-            # if next(Path(str(f)), None) == None:
-            #     Path(str(f)).rmdir()
-            #     continue
+            
             # if  next(Path(path +'\\'+ f.name).iterdir(),None)  == None :
             #     Path(path +'\\'+ f.name).rmdir()
             #     continue
@@ -69,12 +70,12 @@ def movin_files (folder_n):
 
  
 def normalize(file_nam, fold = False):
-    print(str(file_nam))
+    
     if fold:
         fold_name = file_nam.rsplit('\\', 1)[-1]
         fold_name = fold_name.translate(TRANS)
-        # fold_transl = fold_transl.replace(' ', '_')
-        fold_name  = ''.join(fold_name.split())
+        fold_name = fold_name.replace(' ', '_')
+        # fold_name  = ''.join(fold_name.split())
         fold_name = re.sub(r"\W+", r'_', fold_name) 
         new_fold_name = file_nam.rsplit('\\', 1)[-2] + '\\' + fold_name 
         print (type(new_fold_name))
@@ -87,8 +88,8 @@ def normalize(file_nam, fold = False):
          
     file_transl = file_nam.translate(TRANS)
 
-    # file_transl = file_transl.replace(' ', '_')
-    file_transl = ''.join(file_transl.split())
+    file_transl = file_transl.replace(' ', '_')
+    # file_transl = ''.join(file_transl.split())
 
     fil_name = re.sub(r"\W+", r'_', file_transl[:file_transl.rfind('.')]) + '.' +  file_transl[file_transl.rfind('.')+1:]
     
@@ -99,9 +100,9 @@ def normalize(file_nam, fold = False):
 
 def select_folder(file_name):
     file_type = file_name.rsplit('.')[-1]
-    # print (file_type)
+     
     for key,value  in search_folder_files.items():
-        #print (value)
+         
         if re.search(file_type, str(value), flags  = re.IGNORECASE):
             search_files[key].append(file_name)
             extension_files.add(file_type)
@@ -109,26 +110,16 @@ def select_folder(file_name):
     unknow_ext_files.add(file_type) 
     return '' 
 
-def remov_empty_fold(path, level = 1):
-    p = Path(path)
-    print (p)
-    if next(p.iterdir(), None) == None:
-        p.rmdir()
-        # return
-    else :    
-        for f in p.iterdir():
-           if f.is_dir() and  f.name not in search_folder_files.keys():
-            # if next(Path(str(f)), None) == None:
-            #      Path(str(f)).rmdir()
-            #     continue
-                # if  next(Path(path +'\\'+ f.name).iterdir(),None)  == None :
-                #     Path(path +'\\'+ f.name).rmdir()
-                # continue
-            # else:     
-                # print ('Спускаемось',(path + '\\'+ f.name))
-                remov_empty_fold((path +'\\'+ f.name), level+1)
-
-
+def del_empty_fold(path):
+    for f in os.listdir(path):
+        # print (f)
+        fo_n = os.path.join(path, f)
+        if os.path.isdir(fo_n) and  f not in search_folder_files.keys():
+             del_empty_fold(fo_n)
+             if not os.listdir(fo_n):
+                 os.rmdir(fo_n)
+             
+             
 
 
 
@@ -157,7 +148,7 @@ if __name__ == '__main__':
     obhod_folder_(search_path)
     
     
-    # remov_empty_fold(search_path)
+    del_empty_fold(search_path)
     
     
     print('Списки знайдених  файлів :', '\n') 
