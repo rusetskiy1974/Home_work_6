@@ -22,6 +22,15 @@ search_files = {'archives': [],
 extension_files = set()
 unknow_ext_files = set()
 
+CYRILLIC_SYMBOLS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяєіїґ"
+TRANSLATION = ("a", "b", "v", "g", "d", "e", "e", "j", "z", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u",
+               "f", "h", "ts", "ch", "sh", "sch", "", "y", "", "e", "yu", "ya", "je", "i", "ji", "g")
+TRANS = {}
+
+for c, l in zip(CYRILLIC_SYMBOLS, TRANSLATION):
+    TRANS[ord(c)] = l
+    TRANS[ord(c.upper())] = l.upper()
+
 
 
 
@@ -60,6 +69,7 @@ def normalize(file_nam, fold = False):
     
     if fold:
         fold_name = file_nam.rsplit('\\', 1)[-1]
+         
         fold_name = fold_name.translate(TRANS)
         fold_name = fold_name.replace(' ', '_')
         fold_name = re.sub(r"\W+", r'_', fold_name) 
@@ -100,61 +110,52 @@ def del_empty_fold(path):
              if not os.listdir(fo_n):
                  os.rmdir(fo_n)
              
-             
+def start ():
+    global search_path
+    try:
+     
+        search_path = sys.argv[1]
+                    
+        if os.path.exists(search_path):
+        
+            search_path = normalize(search_path, True)
+                                    
+            for key in search_files:
+                if  os.path.isdir(search_path + '\\' + key):
+                    continue
+                else:
+                    os.mkdir(search_path+'\\'+ key)
+                    
+                    
+            parse_folder(search_path)
+
+            del_empty_fold(search_path)
+
+            print('Списки знайдених  файлів :', '\n') 
+            
+            for value in search_files.items():
+                print (value)
+
+
+            print ('Include extension : ', extension_files)
+            print ('Unknown extension : ', unknow_ext_files)
+            return
+        else:
+            print ('Incorrect Path > try again ')  
+            return
+        
+    except:
+        print ('Incorrect Path > try again ')
+    
+        
+           
 
 
 
-CYRILLIC_SYMBOLS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяєіїґ"
-TRANSLATION = ("a", "b", "v", "g", "d", "e", "e", "j", "z", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u",
-               "f", "h", "ts", "ch", "sh", "sch", "", "y", "", "e", "yu", "ya", "je", "i", "ji", "g")
-TRANS = {}
 
-for c, l in zip(CYRILLIC_SYMBOLS, TRANSLATION):
-    TRANS[ord(c)] = l
-    TRANS[ord(c.upper())] = l.upper()
 
 
 if __name__ == '__main__':
     
-     
-    try:
-    
-        search_path = sys.argv[1] 
-        search_path = normalize(search_path, True)
-        
-        
-        for key in search_files:
-            if  os.path.isdir(search_path + '\\' + key):
-                continue
-            else:
-                os.mkdir(search_path+'\\'+ key)
-                
-                
-        parse_folder(search_path)
-    
-        del_empty_fold(search_path)
-    
-        print('Списки знайдених  файлів :', '\n') 
-        for value in search_files.items():
-            print (value)
-    
-
-        print ('Include extension : ', extension_files)
-        print ('Unknown extension : ', unknow_ext_files)
-        
-    except:
-        print ('Incorrect Path > try again ')
-            
-
-    
-
-
-
-
-    
-
-
-
-
-
-
+    start()
+   
